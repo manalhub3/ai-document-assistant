@@ -10,12 +10,29 @@ interface Document {
 export default function DocumentList() {
   const [documents, setDocuments] = useState<Document[]>([])
   const [loading, setLoading] = useState(true)
+  const [deleting, setDeleting] = useState<number | null>(null)
 
-  useEffect(() => {
+  const fetchDocuments = () => {
     api.get('/documents')
       .then(res => setDocuments(res.data))
       .finally(() => setLoading(false))
+  }
+
+  useEffect(() => {
+    fetchDocuments()
   }, [])
+
+  const handleDelete = async (id: number) => {
+    setDeleting(id)
+    try {
+      await api.delete(`/documents/${id}`)
+      setDocuments(prev => prev.filter(d => d.id !== id))
+    } catch {
+      alert('Failed to delete document')
+    } finally {
+      setDeleting(null)
+    }
+  }
 
   if (loading) return <p className="text-sm text-gray-500">Loading documents...</p>
 
@@ -29,10 +46,19 @@ export default function DocumentList() {
       <ul className="space-y-2">
         {documents.map(doc => (
           <li key={doc.id} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-            <span className="text-sm text-gray-800">{doc.filename}</span>
-            <span className="text-xs text-gray-400">
-              {new Date(doc.created_at).toLocaleDateString()}
-            </span>
+            <div>
+              <p className="text-sm text-gray-800">{doc.filename}</p>
+              <p className="text-xs text-gray-400">
+                {new Date(doc.created_at).toLocaleDateString()}
+              </p>
+            </div>
+            <button
+              onClick={() => handleDelete(doc.id)}
+              disabled={deleting === doc.id}
+              className="text-xs text-red-500 hover:text-red-700 disabled:opacity-50 transition-colors"
+            >
+              {deleting === doc.id ? 'Deleting...' : 'Delete'}
+            </button>
           </li>
         ))}
       </ul>

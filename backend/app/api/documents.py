@@ -50,3 +50,15 @@ async def upload_document(
 def list_documents(db: Session = Depends(get_db)):
     documents = db.query(Document).all()
     return [{"id": d.id, "filename": d.filename, "created_at": d.created_at} for d in documents]
+
+@router.delete("/documents/{document_id}")
+def delete_document(document_id: int, db: Session = Depends(get_db)):
+    document = db.query(Document).filter(Document.id == document_id).first()
+    if not document:
+        raise HTTPException(status_code=404, detail="Document not found")
+
+    db.query(DocumentChunk).filter(DocumentChunk.document_id == document_id).delete()
+    db.delete(document)
+    db.commit()
+
+    return {"message": f"Document {document_id} deleted successfully"}
