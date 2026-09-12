@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import axios from 'axios'
+import api from '../api'
 import ReactMarkdown from 'react-markdown'
 
 interface Message {
@@ -27,7 +27,7 @@ export default function Chat() {
     setLoading(true)
 
     try {
-      const res = await axios.post('http://localhost:8000/api/chat', { question })
+      const res = await api.post('/chat', { question })
       setMessages(prev => [...prev, {
         role: 'assistant',
         content: res.data.answer,

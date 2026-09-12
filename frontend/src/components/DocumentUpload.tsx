@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import axios from 'axios'
+import api from '../api'
 
 export default function DocumentUpload() {
   const [uploading, setUploading] = useState(false)
@@ -17,7 +17,7 @@ export default function DocumentUpload() {
     formData.append('file', file)
 
     try {
-      const res = await axios.post('http://localhost:8000/api/documents/upload', formData)
+      const res = await api.post('/documents/upload', formData)
       setMessage({
         type: 'success',
         text: `"${res.data.filename}" uploaded — ${res.data.chunks} chunks created`

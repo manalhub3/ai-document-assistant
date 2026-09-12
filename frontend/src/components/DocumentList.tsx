@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import axios from 'axios'
+import api from '../api'
 
 interface Document {
   id: number
@@ -12,7 +12,7 @@ export default function DocumentList() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    axios.get('http://localhost:8000/api/documents')
+    api.get('/documents')
       .then(res => setDocuments(res.data))
       .finally(() => setLoading(false))
   }, [])
